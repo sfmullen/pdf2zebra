@@ -39,8 +39,16 @@ for pdf_file in os.listdir('./pdfs'):
 
         # If it's a "loginter" file, it will start with a specific string.
         if pdf.pages[0].extractText().split()[0] == 'Identificador':
-            # Create a page for every sticker. Ignore the first page.
-            for i in range(1, amount_of_pages):
+            # Calculate where to start cropping the file
+            starting_page = 0
+            for page in pdf.pages:
+                # Avoid empty pages first.
+                if page.extractText() != '':
+                    # Then, avoid every list pages.
+                    if page.extractText().split()[0] == 'Identificador':
+                        starting_page = starting_page + 1
+            # Create a page for every sticker.
+            for i in range(starting_page, amount_of_pages):
                 # We don't process a page if it's empty.
                 if pdf.pages[i].extractText() is not '':
                     # Copy the ith page to  first_ticket.
