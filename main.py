@@ -6,6 +6,30 @@ from PIL import Image
 import webbrowser
 import datetime
 
+
+def is_it_flex(pdf_reader_file: PyPDF2.pdf.PdfFileReader):
+    if pdf_reader_file.pages[0].extractText().split()[0] == "Identificador":
+        return False
+    return True
+
+
+def get_starting_page(pdf_reader_file: PyPDF2.pdf.PdfFileReader):
+    result = 0
+    for page in pdf_reader_file.pages:
+        # Then, avoid every list pages.
+        for word in page.extractText().split():
+            if word == "pegar":
+                return result
+        result += 1
+    return result
+
+
+def is_it_blank_page(pdf_page: PyPDF2.pdf.PageObject):
+    if pdf_page.extractText() != '':
+        return True
+    return False
+
+
 # Create the output folder if it doesn't exists.
 output_folder_exists = False
 for existing_folders in os.listdir('.'):
@@ -29,24 +53,23 @@ output = PyPDF2.PdfFileWriter()
 
 # Create an individual pdf for every file in the "pdfs" folder.
 for pdf_file in os.listdir('./pdfs'):
+    # Ignore hidden files in UNIX systems. (I'm looking at you macOS)
     if pdf_file.startswith(".") is True:
         continue
+    # Ignore non-PDF files.
+    if not pdf_file.endswith(".pdf"):
+        continue
+
     with open('pdfs/{0}'.format(pdf_file), 'rb') as file:
         # Open the pdf document.
         pdf = PyPDF2.PdfFileReader(file)
         # Get amount of pages.
         amount_of_pages = pdf.getNumPages()
 
-        # If it's a "loginter" file, it will start with a specific string.
-        if pdf.pages[0].extractText().split()[0] == 'Identificador':
+        #  Check type of document.
+        if not is_it_flex(pdf):
             # Calculate where to start cropping the file
-            starting_page = 0
-            for page in pdf.pages:
-                # Avoid empty pages first.
-                if page.extractText() != '':
-                    # Then, avoid every list pages.
-                    if page.extractText().split()[0] == 'Identificador':
-                        starting_page = starting_page + 1
+            starting_page = get_starting_page(pdf)
             # Create a page for every sticker.
             for i in range(starting_page, amount_of_pages):
                 # We don't process a page if it's empty.
@@ -97,9 +120,7 @@ for pdf_file in os.listdir('./pdfs'):
 
                 third_ticket = PyPDF2.PdfFileReader(file).getPage(i)
                 third_ticket.cropBox.lowerLeft = (580, 50)
-                third_ticket.trimBox.lowerLeft = (580, 50)
                 third_ticket.cropBox.upperRight = (830, 570)
-                third_ticket.trimBox.upperRight = (830, 570)
 
                 output.addPage(first_ticket)
                 output.addPage(second_ticket)
