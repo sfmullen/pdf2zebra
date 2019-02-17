@@ -16,13 +16,21 @@ if output_folder_exists is False:
     os.makedirs('output')
 
 # Create the temporary work folder.
-os.makedirs('tmp')
+output_folder_exists = False
+for existing_folders in os.listdir('.'):
+    if existing_folders == "tmp":
+        output_folder_exists = True
+        break
+if output_folder_exists is False:
+    os.makedirs('tmp')
 
 # Create the new output file
 output = PyPDF2.PdfFileWriter()
 
 # Create an individual pdf for every file in the "pdfs" folder.
 for pdf_file in os.listdir('./pdfs'):
+    if pdf_file.startswith(".") is True:
+        continue
     with open('pdfs/{0}'.format(pdf_file), 'rb') as file:
         # Open the pdf document.
         pdf = PyPDF2.PdfFileReader(file)
@@ -129,5 +137,6 @@ with open(output_filename, 'wb') as fout:
     merger.write(fout)
 # Delete the temporary folder.
 os.rmdir('tmp')
+output_filename_path = os.getcwd()
 # Open the the final pdf in a browser to be printed.
-webbrowser.open(output_filename)
+webbrowser.open('file:///' + output_filename_path + '/' + output_filename)
