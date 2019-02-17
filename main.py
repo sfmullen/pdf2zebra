@@ -1,10 +1,10 @@
 import PyPDF2
 import os
+import webbrowser
+import datetime
 from pdf2image import convert_from_path
 from reportlab.pdfgen import canvas
 from PIL import Image
-import webbrowser
-import datetime
 
 
 def is_it_flex(pdf_reader_file: PyPDF2.pdf.PdfFileReader):
@@ -30,23 +30,23 @@ def is_it_blank_page(pdf_page: PyPDF2.pdf.PageObject):
     return False
 
 
+def save_list_pages(pdf_reader_file: PyPDF2.pdf.PdfFileReader, end: int):
+    output_list_pages = PyPDF2.PdfFileWriter()
+    for x in range(0, end):
+        output_list_pages.addPage(pdf_reader_file.getPage(x))
+    output_list_filename = 'output/lists/output_list_pages_{0}.pdf'.format(datetime.datetime.now())
+    with open(output_list_filename, 'wb') as output_file:
+        output_list_pages.write(output_file)
+    return output_list_filename
+
+
 # Create the output folder if it doesn't exists.
-output_folder_exists = False
-for existing_folders in os.listdir('.'):
-    if existing_folders == "output":
-        output_folder_exists = True
-        break
-if output_folder_exists is False:
-    os.makedirs('output')
+os.makedirs('output', exist_ok=True)
+os.makedirs('output/labels', exist_ok=True)
+os.makedirs('output/lists', exist_ok=True)
 
 # Create the temporary work folder.
-output_folder_exists = False
-for existing_folders in os.listdir('.'):
-    if existing_folders == "tmp":
-        output_folder_exists = True
-        break
-if output_folder_exists is False:
-    os.makedirs('tmp')
+os.makedirs('tmp', exist_ok=True)
 
 # Create the new output file
 output = PyPDF2.PdfFileWriter()
@@ -70,6 +70,8 @@ for pdf_file in os.listdir('./pdfs'):
         if not is_it_flex(pdf):
             # Calculate where to start cropping the file
             starting_page = get_starting_page(pdf)
+            # Extract the list pages.
+            list_filename = save_list_pages(pdf, starting_page)
             # Create a page for every sticker.
             for i in range(starting_page, amount_of_pages):
                 # We don't process a page if it's empty.
@@ -161,7 +163,7 @@ for pdfs in sorted(os.listdir('./tmp')):
     # Delete the used pdf.
     os.unlink('tmp/{0}'.format(pdfs))
 # Write the merger to a file.
-output_filename = 'output/output_{0}.pdf'.format(datetime.datetime.now())
+output_filename = 'output/labels/output_{0}.pdf'.format(datetime.datetime.now())
 with open(output_filename, 'wb') as fout:
     merger.write(fout)
 # Delete the temporary folder.
@@ -169,3 +171,4 @@ os.rmdir('tmp')
 output_filename_path = os.getcwd()
 # Open the the final pdf in a browser to be printed.
 webbrowser.open('file:///' + output_filename_path + '/' + output_filename)
+webbrowser.open('file:///' + output_filename_path + '/' + list_filename)
