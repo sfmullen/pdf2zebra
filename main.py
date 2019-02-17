@@ -30,35 +30,29 @@ for pdf_file in os.listdir('./pdfs'):
                 # We don't process a page if it's empty.
                 if pdf.pages[i].extractText() is not '':
                     # Copy the ith page to  first_ticket.
-                    first_ticket_page = PyPDF2.PdfFileReader(file)
-                    first_ticket = first_ticket_page.getPage(i)
+                    first_ticket = PyPDF2.PdfFileReader(file).getPage(i)
                     # Crop the first ticket of the page.
                     first_ticket.cropBox.lowerLeft = (20, 760)
                     first_ticket.cropBox.upperRight = (205, 450)
 
                     # Repeat for every ticket of the page.
-                    second_ticket_page = PyPDF2.PdfFileReader(file)
-                    second_ticket = second_ticket_page.getPage(i)
+                    second_ticket = PyPDF2.PdfFileReader(file).getPage(i)
                     second_ticket.cropBox.lowerLeft = (205, 760)
                     second_ticket.cropBox.upperRight = (390, 450)
 
-                    third_ticket_page = PyPDF2.PdfFileReader(file)
-                    third_ticket = third_ticket_page.getPage(i)
+                    third_ticket = PyPDF2.PdfFileReader(file).getPage(i)
                     third_ticket.cropBox.lowerLeft = (390, 760)
                     third_ticket.cropBox.upperRight = (575, 450)
 
-                    fourth_ticket_page = PyPDF2.PdfFileReader(file)
-                    fourth_ticket = fourth_ticket_page.getPage(i)
+                    fourth_ticket = PyPDF2.PdfFileReader(file).getPage(i)
                     fourth_ticket.cropBox.lowerLeft = (20, 400)
                     fourth_ticket.cropBox.upperRight = (205, 90)
 
-                    fifth_ticket_page = PyPDF2.PdfFileReader(file)
-                    fifth_ticket = fifth_ticket_page.getPage(i)
+                    fifth_ticket = PyPDF2.PdfFileReader(file).getPage(i)
                     fifth_ticket.cropBox.lowerLeft = (205, 400)
                     fifth_ticket.cropBox.upperRight = (390, 90)
 
-                    sixth_ticket_page = PyPDF2.PdfFileReader(file)
-                    sixth_ticket = sixth_ticket_page.getPage(i)
+                    sixth_ticket = PyPDF2.PdfFileReader(file).getPage(i)
                     sixth_ticket.cropBox.lowerLeft = (390, 400)
                     sixth_ticket.cropBox.upperRight = (575, 90)
 
@@ -71,18 +65,15 @@ for pdf_file in os.listdir('./pdfs'):
                     output.addPage(sixth_ticket)
         else:
             for i in range(0, amount_of_pages):
-                first_ticket_page = PyPDF2.PdfFileReader(file)
-                first_ticket = first_ticket_page.getPage(i)
+                first_ticket = PyPDF2.PdfFileReader(file).getPage(i)
                 first_ticket.cropBox.lowerLeft = (30, 50)
                 first_ticket.cropBox.upperRight = (280, 570)
 
-                second_ticket_page = PyPDF2.PdfFileReader(file)
-                second_ticket = second_ticket_page.getPage(i)
+                second_ticket = PyPDF2.PdfFileReader(file).getPage(i)
                 second_ticket.cropBox.lowerLeft = (305, 50)
                 second_ticket.cropBox.upperRight = (555, 570)
 
-                third_ticket_page = PyPDF2.PdfFileReader(file)
-                third_ticket = third_ticket_page.getPage(i)
+                third_ticket = PyPDF2.PdfFileReader(file).getPage(i)
                 third_ticket.cropBox.lowerLeft = (580, 50)
                 third_ticket.trimBox.lowerLeft = (580, 50)
                 third_ticket.cropBox.upperRight = (830, 570)
@@ -93,16 +84,16 @@ for pdf_file in os.listdir('./pdfs'):
                 output.addPage(third_ticket)
 
         # Write the processed pdf file to it's output-0.
-        with open('output-0.pdf', 'wb') as fo:
+        with open('tmp/output-0.pdf', 'wb') as fo:
             output.write(fo)
         # Delete the original pdf.
         os.unlink('pdfs/{0}'.format(pdf_file))
 
 # Convert every page of the output file to a image.
-pages = convert_from_path('output-0.pdf', 300, output_folder='tmp', fmt='jpeg', use_cropbox=True)
+pages = convert_from_path('tmp/output-0.pdf', 300, output_folder='tmp', fmt='jpeg', use_cropbox=True)
 
 # Delete the pdf created.
-os.unlink('output-0.pdf')
+os.unlink('tmp/output-0.pdf')
 
 # Create a new pdf for every image (without the empty tickets).
 for files in os.listdir('./tmp'):
