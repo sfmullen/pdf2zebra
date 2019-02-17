@@ -4,13 +4,19 @@ from pdf2image import convert_from_path
 from reportlab.pdfgen import canvas
 from PIL import Image
 import webbrowser
+import datetime
+
+# Create the output folder if it doesn't exists.
+output_folder_exists = False
+for existing_folders in os.listdir('.'):
+    if existing_folders == "output":
+        output_folder_exists = True
+        break
+if output_folder_exists is False:
+    os.makedirs('output')
 
 # Create the temporary work folder.
 os.makedirs('tmp')
-# Delete an output file if it exists.
-for exisiting_files in (os.listdir('pdfs/')):
-    if exisiting_files == "output.pdf":
-        os.unlink('pdfs/output.pdf')
 
 # Create the new output file
 output = PyPDF2.PdfFileWriter()
@@ -118,9 +124,10 @@ for pdfs in sorted(os.listdir('./tmp')):
     # Delete the used pdf.
     os.unlink('tmp/{0}'.format(pdfs))
 # Write the merger to a file.
-with open('pdfs/output.pdf', 'wb') as fout:
+output_filename = 'output/output_{0}.pdf'.format(datetime.datetime.now())
+with open(output_filename, 'wb') as fout:
     merger.write(fout)
 # Delete the temporary folder.
 os.rmdir('tmp')
 # Open the the final pdf in a browser to be printed.
-webbrowser.open('pdfs/output.pdf')
+webbrowser.open(output_filename)
