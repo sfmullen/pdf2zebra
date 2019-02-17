@@ -34,7 +34,7 @@ def save_list_pages(pdf_reader_file: PyPDF2.pdf.PdfFileReader, end: int):
     output_list_pages = PyPDF2.PdfFileWriter()
     for x in range(0, end):
         output_list_pages.addPage(pdf_reader_file.getPage(x))
-    output_list_filename = 'output/lists/output_list_pages_{0}.pdf'.format(datetime.datetime.now())
+    output_list_filename = 'output/lists/output_list_pages_{0}.pdf'.format(datetime.datetime.now().strftime("%y-%m-%d-%H-%M"))
     with open(output_list_filename, 'wb') as output_file:
         output_list_pages.write(output_file)
     return output_list_filename
@@ -132,10 +132,11 @@ for pdf_file in os.listdir('./pdfs'):
         with open('tmp/output-0.pdf', 'wb') as fo:
             output.write(fo)
         # Delete the original pdf.
+        file.close()
         os.unlink('pdfs/{0}'.format(pdf_file))
 
 # Convert every page of the output file to a image.
-pages = convert_from_path('tmp/output-0.pdf', 300, output_folder='tmp', fmt='jpeg', use_cropbox=True)
+convert_from_path('tmp/output-0.pdf', 300, output_folder='tmp', fmt='jpeg', use_cropbox=True)
 
 # Delete the pdf created.
 os.unlink('tmp/output-0.pdf')
@@ -153,17 +154,21 @@ for files in os.listdir('./tmp'):
         # Save the pdf.
         c.save()
     # Delete the image.
+    image.close()
+    del c
     os.unlink('tmp/{0}'.format(files))
 
 # Create the merger pdf.
 merger = PyPDF2.PdfFileMerger()
 # Append every pdf created before.
 for pdfs in sorted(os.listdir('./tmp')):
-    merger.append(open('tmp/{0}'.format(pdfs), 'rb'))
-    # Delete the used pdf.
+    with open('tmp/{0}'.format(pdfs), 'rb') as merge_pdf:
+        pdf = PyPDF2.PdfFileReader(merge_pdf)
+        merger.append(pdf)
+        # Delete the used pdf.
     os.unlink('tmp/{0}'.format(pdfs))
 # Write the merger to a file.
-output_filename = 'output/labels/output_{0}.pdf'.format(datetime.datetime.now())
+output_filename = 'output/labels/output_{0}.pdf'.format(datetime.datetime.now().strftime("%y-%m-%d-%H-%M"))
 with open(output_filename, 'wb') as fout:
     merger.write(fout)
 # Delete the temporary folder.
