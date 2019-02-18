@@ -2,6 +2,7 @@ import PyPDF2
 import os
 import webbrowser
 import datetime
+import platform
 from pdf2image import convert_from_path
 from reportlab.pdfgen import canvas
 from PIL import Image
@@ -42,7 +43,7 @@ os.makedirs('output/lists', exist_ok=True)
 
 # Create the temporary work folder.
 os.makedirs('tmp', exist_ok=True)
-
+print(platform.system())
 # Create the new output file for the labels
 output = PyPDF2.PdfFileWriter()
 # Create the new output file for the lists.
@@ -56,7 +57,17 @@ for pdf_file in os.listdir('./pdfs'):
     if pdf_file.endswith(".pdf"):
         empty_folder = False
 if empty_folder:
+    os.rmdir("tmp")
     exit()
+
+# Get which OS it's running on for the correct browser path.
+os = platform.system()
+if os == "Linux":
+    chrome_path = '/usr/bin/google-chrome %s'
+if os == "Windows":
+    chrome_path = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s'
+if os == "Darwin":
+    chrome_path = 'open -a /Applications/Google\ Chrome.app %s'
 
 # Create an individual pdf for every file in the "pdfs" folder.
 for pdf_file in os.listdir('./pdfs'):
@@ -186,10 +197,10 @@ with open(output_filename, 'wb') as fout:
 os.rmdir('tmp')
 output_filename_path = os.getcwd()
 # Open the the final pdf in a browser to be printed.
-webbrowser.open('file:///' + output_filename_path + '/' + output_filename)
+webbrowser.get(chrome_path).open('file:///' + output_filename_path + '/' + output_filename)
 if list_pages_exists:
     output_list_filename = 'output/lists/output_list_pages_{0}.pdf'.format(
         datetime.datetime.now().strftime("%y-%m-%d-%H-%M"))
     with open(output_list_filename, 'wb') as output_file:
         list_pages_output.write(output_file)
-    webbrowser.open('file:///' + output_filename_path + '/' + output_list_filename)
+    webbrowser.get(chrome_path).open('file:///' + output_filename_path + '/' + output_list_filename)
