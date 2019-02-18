@@ -30,14 +30,9 @@ def is_it_blank_page(pdf_page: PyPDF2.pdf.PageObject):
     return False
 
 
-def save_list_pages(pdf_reader_file: PyPDF2.pdf.PdfFileReader, end: int):
-    output_list_pages = PyPDF2.PdfFileWriter()
-    for x in range(0, end):
-        output_list_pages.addPage(pdf_reader_file.getPage(x))
-    output_list_filename = 'output/lists/output_list_pages_{0}.pdf'.format(datetime.datetime.now().strftime("%y-%m-%d-%H-%M"))
-    with open(output_list_filename, 'wb') as output_file:
-        output_list_pages.write(output_file)
-    return output_list_filename
+def save_list_pages(input_file: PyPDF2.pdf.PdfFileReader, end: int, output_list_file: PyPDF2.PdfFileMerger):
+    page_range = PyPDF2.PageRange("0:" + str(end))
+    output_list_file.append(input_file, pages=page_range)
 
 
 # Create the output folder if it doesn't exists.
@@ -48,9 +43,10 @@ os.makedirs('output/lists', exist_ok=True)
 # Create the temporary work folder.
 os.makedirs('tmp', exist_ok=True)
 
-# Create the new output file
+# Create the new output file for the labels
 output = PyPDF2.PdfFileWriter()
-
+# Create the new output file for the lists.
+list_pages_output = PyPDF2.PdfFileMerger()
 # Boolean for opening the file at the end.
 list_pages_exists = False
 
@@ -76,7 +72,7 @@ for pdf_file in os.listdir('./pdfs'):
             # Save the product list pages if they exists.
             if starting_page != 0:
                 # Extract the list pages.
-                list_filename = save_list_pages(pdf, starting_page)
+                save_list_pages(pdf, starting_page, list_pages_output)
                 # Change the boolean to open this file at the end.
                 list_pages_exists = True
             # Create a page for every sticker.
@@ -120,15 +116,15 @@ for pdf_file in os.listdir('./pdfs'):
         else:
             for i in range(0, amount_of_pages):
                 first_ticket = PyPDF2.PdfFileReader(file).getPage(i)
-                first_ticket.cropBox.lowerLeft = (40, 90)
+                first_ticket.cropBox.lowerLeft = (45, 90)
                 first_ticket.cropBox.upperRight = (270, 550)
 
                 second_ticket = PyPDF2.PdfFileReader(file).getPage(i)
-                second_ticket.cropBox.lowerLeft = (315, 90)
+                second_ticket.cropBox.lowerLeft = (320, 90)
                 second_ticket.cropBox.upperRight = (545, 550)
 
                 third_ticket = PyPDF2.PdfFileReader(file).getPage(i)
-                third_ticket.cropBox.lowerLeft = (585, 90)
+                third_ticket.cropBox.lowerLeft = (590, 90)
                 third_ticket.cropBox.upperRight = (815, 550)
 
                 output.addPage(first_ticket)
@@ -184,4 +180,8 @@ output_filename_path = os.getcwd()
 # Open the the final pdf in a browser to be printed.
 webbrowser.open('file:///' + output_filename_path + '/' + output_filename)
 if list_pages_exists:
-    webbrowser.open('file:///' + output_filename_path + '/' + list_filename)
+    output_list_filename = 'output/lists/output_list_pages_{0}.pdf'.format(
+        datetime.datetime.now().strftime("%y-%m-%d-%H-%M"))
+    with open(output_list_filename, 'wb') as output_file:
+        list_pages_output.write(output_file)
+    webbrowser.open('file:///' + output_filename_path + '/' + output_list_filename)
