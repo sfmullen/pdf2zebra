@@ -90,29 +90,29 @@ for pdf_file in os.listdir('./pdfs'):
                     # Copy the ith page to  first_ticket.
                     first_ticket = PyPDF2.PdfFileReader(file).getPage(i)
                     # Crop the first ticket of the page.
-                    first_ticket.cropBox.lowerLeft = (20, 760)
-                    first_ticket.cropBox.upperRight = (205, 450)
+                    first_ticket.cropBox.lowerLeft = (22, 760)
+                    first_ticket.cropBox.upperRight = (202, 450)
 
                     # Repeat for every ticket of the page.
                     second_ticket = PyPDF2.PdfFileReader(file).getPage(i)
-                    second_ticket.cropBox.lowerLeft = (205, 760)
-                    second_ticket.cropBox.upperRight = (390, 450)
+                    second_ticket.cropBox.lowerLeft = (208, 760)
+                    second_ticket.cropBox.upperRight = (388, 450)
 
                     third_ticket = PyPDF2.PdfFileReader(file).getPage(i)
-                    third_ticket.cropBox.lowerLeft = (390, 760)
-                    third_ticket.cropBox.upperRight = (575, 450)
+                    third_ticket.cropBox.lowerLeft = (394, 760)
+                    third_ticket.cropBox.upperRight = (574, 450)
 
                     fourth_ticket = PyPDF2.PdfFileReader(file).getPage(i)
-                    fourth_ticket.cropBox.lowerLeft = (20, 400)
-                    fourth_ticket.cropBox.upperRight = (205, 90)
+                    fourth_ticket.cropBox.lowerLeft = (22, 400)
+                    fourth_ticket.cropBox.upperRight = (202, 90)
 
                     fifth_ticket = PyPDF2.PdfFileReader(file).getPage(i)
-                    fifth_ticket.cropBox.lowerLeft = (205, 400)
-                    fifth_ticket.cropBox.upperRight = (390, 90)
+                    fifth_ticket.cropBox.lowerLeft = (208, 400)
+                    fifth_ticket.cropBox.upperRight = (388, 90)
 
                     sixth_ticket = PyPDF2.PdfFileReader(file).getPage(i)
-                    sixth_ticket.cropBox.lowerLeft = (390, 400)
-                    sixth_ticket.cropBox.upperRight = (575, 90)
+                    sixth_ticket.cropBox.lowerLeft = (394, 400)
+                    sixth_ticket.cropBox.upperRight = (574, 90)
 
                     # Add every ticket to the output file.
                     output.addPage(first_ticket)
@@ -161,7 +161,7 @@ for files in os.listdir('./tmp'):
     # Check if image is empty
     if image.getextrema() != ((255, 255), (255, 255), (255, 255)):
         # If it is not, paste it on the pdf.
-        c.drawImage('tmp/{0}'.format(files), 0, 3, 280, 420, preserveAspectRatio=True, showBoundary=True)
+        c.drawImage('tmp/{0}'.format(files), 0, 3, 280, 420, preserveAspectRatio=True)
         # Save the pdf.
         c.save()
     # Delete the image.
