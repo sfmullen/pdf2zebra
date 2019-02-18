@@ -51,6 +51,9 @@ os.makedirs('tmp', exist_ok=True)
 # Create the new output file
 output = PyPDF2.PdfFileWriter()
 
+# Boolean for opening the file at the end.
+list_pages_exists = False
+
 # Create an individual pdf for every file in the "pdfs" folder.
 for pdf_file in os.listdir('./pdfs'):
     # Ignore hidden files in UNIX systems. (I'm looking at you macOS)
@@ -70,8 +73,12 @@ for pdf_file in os.listdir('./pdfs'):
         if not is_it_flex(pdf):
             # Calculate where to start cropping the file
             starting_page = get_starting_page(pdf)
-            # Extract the list pages.
-            list_filename = save_list_pages(pdf, starting_page)
+            # Save the product list pages if they exists.
+            if starting_page != 0:
+                # Extract the list pages.
+                list_filename = save_list_pages(pdf, starting_page)
+                # Change the boolean to open this file at the end.
+                list_pages_exists = True
             # Create a page for every sticker.
             for i in range(starting_page, amount_of_pages):
                 # We don't process a page if it's empty.
@@ -113,16 +120,16 @@ for pdf_file in os.listdir('./pdfs'):
         else:
             for i in range(0, amount_of_pages):
                 first_ticket = PyPDF2.PdfFileReader(file).getPage(i)
-                first_ticket.cropBox.lowerLeft = (30, 50)
-                first_ticket.cropBox.upperRight = (280, 570)
+                first_ticket.cropBox.lowerLeft = (40, 90)
+                first_ticket.cropBox.upperRight = (270, 550)
 
                 second_ticket = PyPDF2.PdfFileReader(file).getPage(i)
-                second_ticket.cropBox.lowerLeft = (305, 50)
-                second_ticket.cropBox.upperRight = (555, 570)
+                second_ticket.cropBox.lowerLeft = (315, 90)
+                second_ticket.cropBox.upperRight = (545, 550)
 
                 third_ticket = PyPDF2.PdfFileReader(file).getPage(i)
-                third_ticket.cropBox.lowerLeft = (580, 50)
-                third_ticket.cropBox.upperRight = (830, 570)
+                third_ticket.cropBox.lowerLeft = (585, 90)
+                third_ticket.cropBox.upperRight = (815, 550)
 
                 output.addPage(first_ticket)
                 output.addPage(second_ticket)
@@ -136,7 +143,7 @@ for pdf_file in os.listdir('./pdfs'):
         os.unlink('pdfs/{0}'.format(pdf_file))
 
 # Convert every page of the output file to a image.
-convert_from_path('tmp/output-0.pdf', 300, output_folder='tmp', fmt='jpeg', use_cropbox=True)
+convert_from_path('tmp/output-0.pdf', 203, output_folder='tmp', fmt='jpeg', use_cropbox=True)
 
 # Delete the pdf created.
 os.unlink('tmp/output-0.pdf')
@@ -150,7 +157,7 @@ for files in os.listdir('./tmp'):
     # Check if image is empty
     if image.getextrema() != ((255, 255), (255, 255), (255, 255)):
         # If it is not, paste it on the pdf.
-        c.drawImage('tmp/{0}'.format(files), 0, 0, 280, 420, preserveAspectRatio=True)
+        c.drawImage('tmp/{0}'.format(files), 0, 3, 280, 420, preserveAspectRatio=True, showBoundary=True)
         # Save the pdf.
         c.save()
     # Delete the image.
@@ -176,4 +183,5 @@ os.rmdir('tmp')
 output_filename_path = os.getcwd()
 # Open the the final pdf in a browser to be printed.
 webbrowser.open('file:///' + output_filename_path + '/' + output_filename)
-webbrowser.open('file:///' + output_filename_path + '/' + list_filename)
+if list_pages_exists:
+    webbrowser.open('file:///' + output_filename_path + '/' + list_filename)
