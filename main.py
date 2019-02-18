@@ -50,6 +50,14 @@ list_pages_output = PyPDF2.PdfFileMerger()
 # Boolean for opening the file at the end.
 list_pages_exists = False
 
+# Check if pdfs folder contains no pdf files.
+empty_folder = True
+for pdf_file in os.listdir('./pdfs'):
+    if pdf_file.endswith(".pdf"):
+        empty_folder = False
+if empty_folder:
+    exit()
+
 # Create an individual pdf for every file in the "pdfs" folder.
 for pdf_file in os.listdir('./pdfs'):
     # Ignore hidden files in UNIX systems. (I'm looking at you macOS)
