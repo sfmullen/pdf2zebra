@@ -43,7 +43,6 @@ os.makedirs('output/lists', exist_ok=True)
 
 # Create the temporary work folder.
 os.makedirs('tmp', exist_ok=True)
-print(platform.system())
 # Create the new output file for the labels
 output = PyPDF2.PdfFileWriter()
 # Create the new output file for the lists.
@@ -61,13 +60,13 @@ if empty_folder:
     exit()
 
 # Get which OS it's running on for the correct browser path.
-os = platform.system()
-if os == "Linux":
+running_os = platform.system()
+if running_os == "Linux":
     chrome_path = '/usr/bin/google-chrome %s'
-if os == "Windows":
+if running_os == "Windows":
     chrome_path = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s'
-if os == "Darwin":
-    chrome_path = 'open -a /Applications/Google\ Chrome.app %s'
+if running_os == "Darwin":
+    chrome_path = "open -a /Applications/Google\ Chrome.app %s"
 
 # Create an individual pdf for every file in the "pdfs" folder.
 for pdf_file in os.listdir('./pdfs'):
