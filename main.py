@@ -5,6 +5,8 @@ import datetime
 import platform
 from pdf2image import convert_from_path
 from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
+from reportlab.lib.units import mm
 from PIL import Image
 
 
@@ -164,14 +166,17 @@ os.unlink('tmp/output-0.pdf')
 
 # Create a new pdf for every image (without the empty tickets).
 for files in os.listdir('./tmp'):
-    # Create the pdf with the images, with correct format for a 100x150mm page.
-    c = canvas.Canvas('./tmp/{0}.pdf'.format(files), pagesize=(283.01, 424.52))
+    # Create the pdf with the images, with correct format for a 100x75mm page.
+    pagesize = (100 * mm, 75 * mm)
+    c = canvas.Canvas('./tmp/{0}.pdf'.format(files), pagesize=pagesize)
     # Open the image.
     image = Image.open('tmp/{0}'.format(files))
+    # Rotate the image.
+    image = image.rotate(90, expand=True)
     # Check if image is empty
     if image.getextrema() != ((255, 255), (255, 255), (255, 255)):
         # If it is not, paste it on the pdf.
-        c.drawImage('tmp/{0}'.format(files), 0, 3, 280, 420, preserveAspectRatio=True)
+        c.drawImage(ImageReader(image), 0, 0, width=100 * mm, height=75 * mm, preserveAspectRatio=True)
         # Save the pdf.
         c.save()
     # Delete the image.
