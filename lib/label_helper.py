@@ -27,7 +27,7 @@ def save_correo_argentino_pages(file: PyPDF2.pdf.PdfFileReader, index: list) -> 
     output = PyPDF2.PdfFileWriter()
     for i in range(len(index)):
         output.addPage(file.getPage(index[i]))
-    output_list_filename = 'output/lists/{0}.pdf'.format(datetime.datetime.now().strftime("%d-%m-%y--%H:%M:%S"))
+    output_list_filename = 'output/lists/{0}.pdf'.format(datetime.datetime.now().strftime("%d-%m-%y--%H_%M_%S"))
     with open(output_list_filename, 'wb') as output_file:
         output.write(output_file)
     return output_list_filename
