@@ -20,3 +20,7 @@ For now, it is possible to change two settings: Rotate and Thermal, inside **set
 #### Output:
 
 The resulting PDF files should be automatically opened inside Google Chrome. If you want to change the browser, or if it is not installed in the default location, you have to change the path in Line 42 inside **main.py**
+
+#### Troubleshooting:
+
+If the label text is blurry/fuzzy, try to print the PDF from Adobe Reader or Microsoft Edge. Alternatively, you can change the code where the document is opened automatically, to be opened with the default PDF reader. Simply change `webbrowser.get(chrome_path).open('file:///' + output_filename_path + '/' + output_filename)` to `os.startfile(output_filename_path + '/' + output_filename)`
