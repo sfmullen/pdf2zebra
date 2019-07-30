@@ -10,7 +10,7 @@ if __name__ == '__main__':
     # Load the config file
     config = configparser.ConfigParser()
     config.read('settings.ini')
-    include_correo_argentino = config["CORREO ARGENTINO LIST"].getboolean('Thermal')
+    include_shipping_list = config["SHIPPING LISTS"].getboolean('Thermal')
     rotate_labels = config["PRINTER"].getboolean('Rotate')
 
     # Open the log file
@@ -25,7 +25,6 @@ if __name__ == '__main__':
     os.makedirs('output/lists', exist_ok=True)
 
     # Create the temporary work folder. (WE DONT NEED THIS FOR NOW)
-    # os.makedirs('tmp', exist_ok=True)
     # Create the new output file for the labels
     output = PyPDF2.PdfFileWriter()
 
@@ -35,7 +34,6 @@ if __name__ == '__main__':
         if pdf_file.endswith(".pdf"):
             empty_folder = False
     if empty_folder:
-        # os.rmdir("tmp")
         exit()
         logging.info("No pdf file found!")
 
@@ -62,9 +60,9 @@ if __name__ == '__main__':
             pdf = PyPDF2.PdfFileReader(file)
             # Get amount of pages.
             amount_of_pages = pdf.getNumPages()
-            # If we want to separate the Correo Argentino labels, we save an index.
-            if not include_correo_argentino:
-                correo_argentino_index = []
+            # If we want to separate the shipping lists, we save an index.
+            if include_shipping_list:
+                shipping_list_index = []
             for index in range(amount_of_pages):
                 #  Check type of page.
                 page_type = delivery_type(pdf.pages[index])
@@ -142,11 +140,42 @@ if __name__ == '__main__':
                             third_ticket = third_ticket.rotateClockwise(90)
                         output.addPage(third_ticket)
 
-                if page_type["type"] == "Correo Argentino List" or page_type["type"] == "Correo Argentino":
-                    if include_correo_argentino:
-                        output.addPage(PyPDF2.PdfFileReader(file).getPage(index))
-                    else:
-                        correo_argentino_index.append(index)
+                if page_type["type"] == "Shipping List" and include_shipping_list:
+                    shipping_list_index.append(index)
+
+                if page_type["type"] == "Correo Argentino":
+                    first_ticket = PyPDF2.PdfFileReader(file).getPage(index)
+                    first_ticket.cropBox.lowerLeft = (10, 777)
+                    first_ticket.cropBox.upperRight = (273, 470)
+                    if rotate_labels:
+                        first_ticket = first_ticket.rotateClockwise(90)
+                    output.addPage(first_ticket)
+
+                    # Repeat for every ticket of the page.
+                    if page_type["amount"] > 1:
+                        second_ticket = PyPDF2.PdfFileReader(file).getPage(index)
+                        second_ticket.cropBox.lowerLeft = (320, 777)
+                        second_ticket.cropBox.upperRight = (583, 470)
+                        if rotate_labels:
+                            second_ticket = second_ticket.rotateClockwise(90)
+                        output.addPage(second_ticket)
+
+                    if page_type["amount"] > 2:
+                        third_ticket = PyPDF2.PdfFileReader(file).getPage(index)
+                        third_ticket.cropBox.lowerLeft = (10, 362)
+                        third_ticket.cropBox.upperRight = (273, 55)
+                        if rotate_labels:
+                            third_ticket = third_ticket.rotateClockwise(90)
+                        output.addPage(third_ticket)
+
+                    if page_type["amount"] > 3:
+                        fourth_ticket = PyPDF2.PdfFileReader(file).getPage(index)
+                        fourth_ticket.cropBox.lowerLeft = (320, 362)
+                        fourth_ticket.cropBox.upperRight = (583, 55)
+                        if rotate_labels:
+                            fourth_ticket = fourth_ticket.rotateClockwise(90)
+                        output.addPage(fourth_ticket)
+
             output_labels_exists = False
             # Write the processed pdf file.
             if output.getNumPages() > 0:
@@ -155,21 +184,20 @@ if __name__ == '__main__':
                 with open(output_filename, 'wb') as output_file:
                     output.write(output_file)
                     logging.info("Saved the new labels in %s", output_filename)
-            correo_argentino_filename = None
-            if not include_correo_argentino:
-                if len(correo_argentino_index) > 0:
-                    correo_argentino_filename = save_correo_argentino_pages(PyPDF2.PdfFileReader(file),
-                                                                            correo_argentino_index)
-                    logging.info("Saved the new Correo Argentino pages in %s", correo_argentino_filename)
+
+            shipping_list_filename = None
+            if include_shipping_list and len(shipping_list_index) > 0:
+                shipping_list_filename = save_shipping_list_pages(PyPDF2.PdfFileReader(file),
+                                                                  shipping_list_index)
+                logging.info("Saved the new Correo Argentino pages in %s", shipping_list_filename)
             file.close()
             # Delete the original pdf.
             os.unlink('pdfs/{0}'.format(pdf_file))
 
-    # Delete the temporary folder.
-    # os.rmdir('tmp')
+    # Get the absolute path of the working directory.
     output_filename_path = os.getcwd()
     # Open the the final pdf in a browser to be printed.
     if output_labels_exists:
         webbrowser.get(chrome_path).open('file:///' + output_filename_path + '/' + output_filename)
-    if correo_argentino_filename:
-        webbrowser.get(chrome_path).open('file:///' + output_filename_path + '/' + correo_argentino_filename)
+    if shipping_list_filename:
+        webbrowser.get(chrome_path).open('file:///' + output_filename_path + '/' + shipping_list_filename)
