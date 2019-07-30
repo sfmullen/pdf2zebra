@@ -10,7 +10,7 @@ if __name__ == '__main__':
     # Load the config file
     config = configparser.ConfigParser()
     config.read('settings.ini')
-    include_shipping_list = config["SHIPPING LISTS"].getboolean('Thermal')
+    include_shipping_list = config["SHIPPING LISTS"].getboolean('Process')
     rotate_labels = config["PRINTER"].getboolean('Rotate')
 
     # Open the log file
