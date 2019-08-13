@@ -4,6 +4,9 @@ import webbrowser
 import platform
 import configparser
 import logging
+import io
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 
 if __name__ == '__main__':
 
@@ -76,7 +79,6 @@ if __name__ == '__main__':
                     if rotate_labels:
                         first_ticket = first_ticket.rotateClockwise(90)
                     output.addPage(first_ticket)
-
                     # Repeat for every ticket of the page.
                     if page_type["amount"] > 1:
                         second_ticket = PyPDF2.PdfFileReader(file).getPage(index)
@@ -120,6 +122,10 @@ if __name__ == '__main__':
 
                 if page_type["type"] == "Flex":
                     first_ticket = PyPDF2.PdfFileReader(file).getPage(index)
+                    # For later implementation of real ZPL labels.
+                    # text = first_ticket.extractText()
+                    # a = re.findall(r'\d{11}', text)
+                    # print(a)
                     first_ticket.cropBox.lowerLeft = (45, 90)
                     first_ticket.cropBox.upperRight = (270, 500)
                     if rotate_labels:
@@ -143,10 +149,10 @@ if __name__ == '__main__':
                 if page_type["type"] == "Shipping List" and include_shipping_list:
                     shipping_list_index.append(index)
 
-                if page_type["type"] == "Correo Argentino":
+                if page_type["type"] == "Mail Shipping":
                     first_ticket = PyPDF2.PdfFileReader(file).getPage(index)
-                    first_ticket.cropBox.lowerLeft = (10, 777)
-                    first_ticket.cropBox.upperRight = (273, 470)
+                    first_ticket.cropBox.lowerLeft = (0, 787)
+                    first_ticket.cropBox.upperRight = (283, 460)
                     if rotate_labels:
                         first_ticket = first_ticket.rotateClockwise(90)
                     output.addPage(first_ticket)
@@ -154,24 +160,24 @@ if __name__ == '__main__':
                     # Repeat for every ticket of the page.
                     if page_type["amount"] > 1:
                         second_ticket = PyPDF2.PdfFileReader(file).getPage(index)
-                        second_ticket.cropBox.lowerLeft = (320, 777)
-                        second_ticket.cropBox.upperRight = (583, 470)
+                        second_ticket.cropBox.lowerLeft = (310, 787)
+                        second_ticket.cropBox.upperRight = (593, 460)
                         if rotate_labels:
                             second_ticket = second_ticket.rotateClockwise(90)
                         output.addPage(second_ticket)
 
                     if page_type["amount"] > 2:
                         third_ticket = PyPDF2.PdfFileReader(file).getPage(index)
-                        third_ticket.cropBox.lowerLeft = (10, 362)
-                        third_ticket.cropBox.upperRight = (273, 55)
+                        third_ticket.cropBox.lowerLeft = (0, 372)
+                        third_ticket.cropBox.upperRight = (283, 45)
                         if rotate_labels:
                             third_ticket = third_ticket.rotateClockwise(90)
                         output.addPage(third_ticket)
 
                     if page_type["amount"] > 3:
                         fourth_ticket = PyPDF2.PdfFileReader(file).getPage(index)
-                        fourth_ticket.cropBox.lowerLeft = (320, 362)
-                        fourth_ticket.cropBox.upperRight = (583, 55)
+                        fourth_ticket.cropBox.lowerLeft = (310, 372)
+                        fourth_ticket.cropBox.upperRight = (593, 45)
                         if rotate_labels:
                             fourth_ticket = fourth_ticket.rotateClockwise(90)
                         output.addPage(fourth_ticket)

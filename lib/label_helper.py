@@ -10,23 +10,21 @@ def delivery_type(page: PyPDF2.pdf.PageObject) -> dict:
         result["type"] = "Flex"
         result["amount"] = len((re.findall("Mercado Envíos Flex", page_text)))
         return result
-    elif re.search("IdentificaciónProductosDespacha", page_text) is not None or re.search(
-            "Nº SEGUIMIENTOPRODUCTO", page_text) is not None or re.search("Identificador Producto",
-                                                                          page_text) is not None:
-        result["type"] = "Shipping List"
-        result["amount"] = 1
-        return result
     elif re.search("Información para el armado del paquete", page_text) is not None:
         result["type"] = "Loginter"
         result["amount"] = len((re.findall("Información para el armado del paquete", page_text)))
+        return result
+    elif '/XObject' in page['/Resources'] and page_text == '':
+        result["type"] = "Mail Shipping"
+        amount_of_images = page['/Resources']
+        result["amount"] = len(amount_of_images['/XObject'])
         return result
     elif is_it_blank_page(page):
         result["type"] = "Empty Page"
         result["amount"] = 0
         return result
-    result["type"] = "Correo Argentino"
-    amount_of_images = page['/Resources']
-    result["amount"] = len(amount_of_images['/XObject'])
+    result["type"] = "Shipping List"
+    result["amount"] = 1
     return result
 
 
