@@ -1,4 +1,4 @@
-# pdf-to-zebra
+# pdf2zebra
 A Python Script to convert a PDF file containing MercadoLibre shipping labels to a compatible format for the Zebra Thermal Printer.
 
 ### Requirements
