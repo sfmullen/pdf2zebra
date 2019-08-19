@@ -153,4 +153,5 @@ def process_files(include_shipping_list: bool, rotate_labels: bool):
             file.close()
 
             # Archive the original pdf.
-            os.rename('pdfs/{0}'.format(pdf_file), 'archive/originals/{0}'.format(pdf_file))
+            os.rename('pdfs/{0}'.format(pdf_file), 'archive/originals/{0}'.format(
+                datetime.datetime.now().strftime("%d-%m-%y--%H_%M_%S")))
