@@ -1,5 +1,4 @@
 import configparser
-import logging
 import time
 
 from watchdog.events import FileSystemEventHandler
@@ -24,8 +23,8 @@ class PDFHandler(FileSystemEventHandler):
         # Process every pdf in the watch folder.
         for filename in os.listdir('./pdfs'):
             if filename.endswith('.pdf'):
-                wait_for_file_to_finish_copy(filename)
-                process_files(filename, include_shipping_list, rotate_labels)
+                wait_for_file_to_finish_copy('pdfs/' + filename)
+                process_files(filename, include_shipping_list, rotate_labels, printer_name)
             else:
                 continue
 
@@ -38,6 +37,7 @@ if __name__ == '__main__':
     config.read('settings.ini')
     include_shipping_list = config["SHIPPING LISTS"].getboolean('Process')
     rotate_labels = config["PRINTER"].getboolean('Rotate')
+    printer_name = config["PRINTER"]['Printer Name']
 
     # Open the log file
     print("Open logging file...")
