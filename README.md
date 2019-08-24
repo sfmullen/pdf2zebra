@@ -1,26 +1,43 @@
-# pdf2zebra
-A Python Script to convert a PDF file containing MercadoLibre shipping labels to a compatible format for the Zebra Thermal Printer.
+<p align="center"><img src="https://raw.githubusercontent.com/MacMullen/github-resources/master/banner.png"/></p>
 
-### Requirements
+A Python3 Script to convert a PDF file containing MercadoLibre shipping labels to a compatible format for the Zebra Thermal Printer.
 
-Python3
+#### Installation
 
-PyPDF2: ``pip install PyPDF2``
+Install the packages listed in the requirements file.
 
-### Usage:
+```
+pip install -r requirements.txt
+```
 
-Simply copy the pdf containing the shipping labels inside the **pdfs/** folder, and execute the script ``python3 main.py``
+#### Usage:
+Simply start the program via the command line:
+```
+python3 main.py
+```
+Wait for it to create the necessary folder structure in the root folder (where **main.py** was executed), and start processing your files by copying/moving them to the **pdfs** folder.
 
-#### Settings:
+Output files are saved in the **archive** folder. Shipping labels are saved in the **labels** folder, shipping lists in the **lists** folder and the original files are moved to **originals**.
 
-For now, it is possible to change two settings: Rotate and Thermal, inside **settings.ini**. Under [CORREO ARGENTINO LIST], **Thermal** controls if the Correo Argentino labels should be included in the output file within the Loginter and Flex labels. If not, a separate PDF file will be created instead.
+##### Settings:
+Inside **settings.ini** you can find the following settings that change the output result.
+
+**Process** under the SHIPPING LISTS section, controls if the shipping lists are processed or not. If you choose to, they will be saved on separate file, saved in the **lists** folder.
 
 **Rotate** changes the rotation of the labels. If changed to **yes**, then the resulting labels will be rotated clockwise 90 degrees. This is useful if you don't want to change the default printing orientation of the printer settings.
 
-#### Output:
+**Printer Name**, is the name of the printer which it will send the labels to print to after being processed. It should be exactly as it is shown by Windows. (e.g "Microsoft XPS Document Writer")
 
-The resulting PDF files should be automatically opened inside Google Chrome. If you want to change the browser, or if it is not installed in the default location, you have to change the path in Line 42 inside **main.py**
+#### Automation:
 
-#### Troubleshooting:
+After being processed, the output file/s are opened in the default PDF viewer. If you are on Windows, you can choose to send them to the printer directly. Download the <a href="https://www.sumatrapdfreader.org/download-free-pdf-viewer.html" target="_blank">portable version of SumatraPDF</a> and copy the **SumatraPDF** executable to the root directory of pdf2zebra. Afterwards, write the name of the thermal printer as shown by Windows, inside the **settings.ini**, under the PRINTER section.
 
-If the label text is blurry/fuzzy, try to print the PDF from Adobe Reader or Microsoft Edge. Alternatively, you can change the code where the document is opened automatically, to be opened with the default PDF reader. Simply change `webbrowser.get(chrome_path).open('file:///' + output_filename_path + '/' + output_filename)` to `os.startfile(output_filename_path + '/' + output_filename)`
+#### Credits
+
+Zebra icon made by <a href="https://www.flaticon.com/authors/flat-icons" title="Flat Icons">Flat Icons</a> from <a href="https://www.flaticon.com/"             title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"             title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
+
+PDF file icon made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/"             title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"             title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
+
+watchdog package made by https://github.com/gorakhargosh/watchdog
+
+PyPDF2 pacakge made by https://github.com/mstamy2/PyPDF2
