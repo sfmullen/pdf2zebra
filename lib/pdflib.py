@@ -46,7 +46,7 @@ def process_files(pdf_file: str, include_shipping_list: bool, rotate_labels: boo
                 print("Saving the new labels in {0}".format(output_filename))
                 if platform.system() == 'Windows' and 'SumatraPDF.exe' in os.listdir('./'):
                     printer = 'SET-YOUR-THERMAL-PRINTER-NAME-HERE'
-                    args = "-print-to \"{0}\" \"{1}\"".format(printer, pdf_file)
+                    args = "-print-to \"{0}\" \"{1}\"".format(printer, output_filename)
                     logging.info("Sending %s to printer %s", pdf_file, printer)
                     print("Sending {0} to printer {1}".format(pdf_file, printer))
                     os.system('SumatraPDF.exe ' + args)

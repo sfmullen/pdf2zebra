@@ -1,9 +1,22 @@
-from lib.pdflib import *
-from watchdog.events import FileSystemEventHandler
-from watchdog.observers import Observer
-import time
 import configparser
 import logging
+import time
+
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
+
+from lib.pdflib import *
+
+
+def wait_for_file_to_finish_copy(filename: str):
+    copy_finished = False
+    print("Waiting for file to finish copying...")
+    while not copy_finished:
+        old_size = os.path.getsize(filename)
+        time.sleep(0.3)
+        if os.path.getsize(filename) == old_size:
+            copy_finished = True
+    return
 
 
 class PDFHandler(FileSystemEventHandler):
@@ -11,6 +24,7 @@ class PDFHandler(FileSystemEventHandler):
         # Process every pdf in the watch folder.
         for filename in os.listdir('./pdfs'):
             if filename.endswith('.pdf'):
+                wait_for_file_to_finish_copy(filename)
                 process_files(filename, include_shipping_list, rotate_labels)
             else:
                 continue
