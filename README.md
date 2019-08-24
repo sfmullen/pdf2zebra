@@ -1,4 +1,4 @@
-<p align="center"><img src="https://raw.githubusercontent.com/MacMullen/github-resources/master/banner.png"/></p>
+<p align="center"><img src="https://raw.githubusercontent.com/MacMullen/github-resources/master/pdf2zebra/banner.png"/></p>
 
 A Python3 Script to convert a PDF file containing MercadoLibre shipping labels to a compatible format for the Zebra Thermal Printer.
 
