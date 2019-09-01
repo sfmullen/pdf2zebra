@@ -1,7 +1,8 @@
-from .labellib import *
+import logging
 import os
 import platform
-import logging
+
+from .labellib import *
 
 
 def process_files(pdf_file: str, include_shipping_list: bool, rotate_labels: bool, printer_name: str):
@@ -29,7 +30,7 @@ def process_files(pdf_file: str, include_shipping_list: bool, rotate_labels: boo
             if label_type['type'] != 'Shipping List':
                 print("Page {0} has {1} {2} labels".format(index, label_type["amount"], label_type["type"]))
                 logging.info("page %i has %i %s labels", index, label_type["amount"], label_type["type"])
-                separate_labels(page=pdf_reader.getPage(index), label_type=label_type['type'],
+                separate_labels(file=file, page_number=index, label_type=label_type['type'],
                                 amount=label_type['amount'], rotate_labels=rotate_labels, output=output)
             else:
                 print("Page {0} has a Shipping List".format(index))
@@ -66,3 +67,5 @@ def process_files(pdf_file: str, include_shipping_list: bool, rotate_labels: boo
 
         print("\33[92m{0} successfully processed! \033[0m".format(pdf_file))
         logging.info("%s succesfully processed!", pdf_file)
+
+    modify_labels(output_filename)

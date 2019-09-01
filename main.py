@@ -52,6 +52,7 @@ if __name__ == '__main__':
     os.makedirs('archive/labels', exist_ok=True)
     os.makedirs('archive/lists', exist_ok=True)
     os.makedirs('archive/originals', exist_ok=True)
+    os.makedirs('archive/modified_labels', exist_ok=True)
     os.makedirs('pdfs', exist_ok=True)
 
     print("Creating event handler...")
