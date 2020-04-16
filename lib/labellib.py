@@ -2,6 +2,7 @@ import datetime
 import io
 import re
 import time
+import tabula
 
 from PyPDF2 import pdf, PdfFileWriter, PdfFileReader
 from reportlab.graphics import renderPDF
@@ -10,15 +11,14 @@ from reportlab.graphics.shapes import Drawing
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfgen import canvas
 from reportlab.platypus import Table, Paragraph
-from tabula import read_pdf
 
 
 def delivery_type(page: pdf.PageObject) -> dict:
     result = dict()
     page_text = page.extractText()
-    if re.search("Mercado Envíos Flex", page_text) is not None:
+    if re.search("Mercado envíos FLEX", page_text) is not None:
         result["type"] = "Flex"
-        result["amount"] = len((re.findall("Mercado Envíos Flex", page_text)))
+        result["amount"] = len((re.findall("Mercado envíos FLEX", page_text)))
         return result
     elif re.search("Información para el armado del paquete", page_text) is not None:
         result["type"] = "Loginter"
@@ -110,25 +110,18 @@ def separate_labels(file: object, page_number: int, label_type: str, amount: int
 
     if label_type == "Flex":
         first_ticket = PdfFileReader(file).getPage(page_number)
-        first_ticket.cropBox.lowerLeft = (45, 90)
-        first_ticket.cropBox.upperRight = (270, 500)
+        first_ticket.cropBox.lowerLeft = (30, 250)
+        first_ticket.cropBox.upperRight = (310, 565)
         if rotate_labels:
             first_ticket = first_ticket.rotateClockwise(90)
         output.addPage(first_ticket)
         if amount > 1:
             second_ticket = PdfFileReader(file).getPage(page_number)
-            second_ticket.cropBox.lowerLeft = (320, 90)
-            second_ticket.cropBox.upperRight = (545, 500)
+            second_ticket.cropBox.lowerLeft = (370, 250)
+            second_ticket.cropBox.upperRight = (650, 565)
             if rotate_labels:
                 second_ticket = second_ticket.rotateClockwise(90)
             output.addPage(second_ticket)
-        if amount > 2:
-            third_ticket = PdfFileReader(file).getPage(page_number)
-            third_ticket.cropBox.lowerLeft = (590, 90)
-            third_ticket.cropBox.upperRight = (815, 500)
-            if rotate_labels:
-                third_ticket = third_ticket.rotateClockwise(90)
-            output.addPage(third_ticket)
 
     if label_type == "Mail Shipping":
         first_ticket = PdfFileReader(file).getPage(page_number)
@@ -174,7 +167,7 @@ def get_shipment_id_from_label(table):
 
 
 def search_shipment_ids(file: str) -> list:
-    df2 = read_pdf(file, pages="all", area=(0, 0, 100, 100), relative_area=True, output_format="json",
+    df2 = tabula.read_pdf(file, pages="all", area=(0, 0, 100, 100), relative_area=True, output_format="json",
                    stream=True)
     result = []
     for table in df2:

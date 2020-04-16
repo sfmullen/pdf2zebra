@@ -1,5 +1,4 @@
 import configparser
-import time
 
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
