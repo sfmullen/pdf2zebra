@@ -94,18 +94,32 @@ def separate_labels(file: object, page_number: int, label_type: str, amount: int
 
     if label_type == "Flex":
         first_ticket = PdfFileReader(file).getPage(page_number)
-        first_ticket.cropBox.lowerLeft = (30, 250)
-        first_ticket.cropBox.upperRight = (310, 565)
+        first_ticket.cropBox.lowerLeft = (30, 510)
+        first_ticket.cropBox.upperRight = (285, 815)
         if rotate_labels:
             first_ticket = first_ticket.rotateClockwise(90)
         output.addPage(first_ticket)
         if amount > 1:
             second_ticket = PdfFileReader(file).getPage(page_number)
-            second_ticket.cropBox.lowerLeft = (370, 250)
-            second_ticket.cropBox.upperRight = (650, 565)
+            second_ticket.cropBox.lowerLeft = (295, 510)
+            second_ticket.cropBox.upperRight = (550, 815)
             if rotate_labels:
                 second_ticket = second_ticket.rotateClockwise(90)
             output.addPage(second_ticket)
+        if amount > 2:
+            third_ticket = PdfFileReader(file).getPage(page_number)
+            third_ticket.cropBox.lowerLeft = (30, 90)
+            third_ticket.cropBox.upperRight = (285, 395)
+            if rotate_labels:
+                third_ticket = third_ticket.rotateClockwise(90)
+            output.addPage(third_ticket)
+        if amount > 3:
+            fourth_ticket = PdfFileReader(file).getPage(page_number)
+            fourth_ticket.cropBox.lowerLeft = (295, 90)
+            fourth_ticket.cropBox.upperRight = (550, 395)
+            if rotate_labels:
+                fourth_ticket = fourth_ticket.rotateClockwise(90)
+            output.addPage(fourth_ticket)
 
     if label_type == "Mail Shipping":
         first_ticket = PdfFileReader(file).getPage(page_number)
