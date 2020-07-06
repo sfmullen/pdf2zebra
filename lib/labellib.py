@@ -62,51 +62,35 @@ def separate_labels(file: object, page_number: int, label_type: str, amount: int
         # Copy the ith page to first_ticket.
         first_ticket = PdfFileReader(file).getPage(page_number)
         # Crop the first ticket of the page.
-        first_ticket.cropBox.lowerLeft = (22, 750)
-        first_ticket.cropBox.upperRight = (202, 465)
+        first_ticket.cropBox.lowerLeft = (28, 820)
+        first_ticket.cropBox.upperRight = (292, 420)
         if rotate_labels:
             first_ticket = first_ticket.rotateClockwise(90)
         output.addPage(first_ticket)
         # Repeat for every ticket of the page.
         if amount > 1:
             second_ticket = PdfFileReader(file).getPage(page_number)
-            second_ticket.cropBox.lowerLeft = (208, 750)
-            second_ticket.cropBox.upperRight = (388, 465)
+            second_ticket.cropBox.lowerLeft = (296, 820)
+            second_ticket.cropBox.upperRight = (560, 420)
             if rotate_labels:
                 second_ticket = second_ticket.rotateClockwise(90)
             output.addPage(second_ticket)
 
         if amount > 2:
             third_ticket = PdfFileReader(file).getPage(page_number)
-            third_ticket.cropBox.lowerLeft = (394, 750)
-            third_ticket.cropBox.upperRight = (574, 465)
+            third_ticket.cropBox.lowerLeft = (28, 400)
+            third_ticket.cropBox.upperRight = (292, 0)
             if rotate_labels:
                 third_ticket = third_ticket.rotateClockwise(90)
             output.addPage(third_ticket)
 
         if amount > 3:
             fourth_ticket = PdfFileReader(file).getPage(page_number)
-            fourth_ticket.cropBox.lowerLeft = (22, 390)
-            fourth_ticket.cropBox.upperRight = (202, 105)
+            fourth_ticket.cropBox.lowerLeft = (296, 400)
+            fourth_ticket.cropBox.upperRight = (560, 0)
             if rotate_labels:
                 fourth_ticket = fourth_ticket.rotateClockwise(90)
             output.addPage(fourth_ticket)
-
-        if amount > 4:
-            fifth_ticket = PdfFileReader(file).getPage(page_number)
-            fifth_ticket.cropBox.lowerLeft = (208, 390)
-            fifth_ticket.cropBox.upperRight = (388, 105)
-            if rotate_labels:
-                fifth_ticket = fifth_ticket.rotateClockwise(90)
-            output.addPage(fifth_ticket)
-
-        if amount > 5:
-            sixth_ticket = PdfFileReader(file).getPage(page_number)
-            sixth_ticket.cropBox.lowerLeft = (394, 390)
-            sixth_ticket.cropBox.upperRight = (574, 105)
-            if rotate_labels:
-                sixth_ticket = sixth_ticket.rotateClockwise(90)
-            output.addPage(sixth_ticket)
 
     if label_type == "Flex":
         first_ticket = PdfFileReader(file).getPage(page_number)
