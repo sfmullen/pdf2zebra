@@ -3,7 +3,7 @@ distro==1.5.0
 numpy==1.18.2
 pandas==1.0.3
 pathtools==0.1.2
-Pillow==7.1.1
+Pillow==8.1.1
 PyPDF2==1.26.0
 python-dateutil==2.8.1
 pytz==2019.3
