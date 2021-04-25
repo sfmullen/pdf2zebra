@@ -16,26 +16,18 @@ from reportlab.platypus import Table, Paragraph
 def delivery_type(page: pdf.PageObject) -> dict:
     result = dict()
     page_text = page.extractText()
-    if re.search("Mercado envíos FLEX", page_text) is not None:
-        result["type"] = "Flex"
-        result["amount"] = len((re.findall("Mercado envíos FLEX", page_text)))
-        return result
-    elif re.search("Información para el armado del paquete", page_text) is not None:
-        result["type"] = "Loginter"
-        result["amount"] = len((re.findall("Información para el armado del paquete", page_text)))
-        return result
-    elif '/XObject' in page['/Resources'] and page_text == '':
-        result["type"] = "Mail Shipping"
-        amount_of_images = page['/Resources']
-        result["amount"] = len(amount_of_images['/XObject'])
+    if re.search("Tracking", page_text) is not None:
+        result["type"] = "Label"
+        result["amount"] = len((re.findall("Tracking", page_text)))
         return result
     elif is_it_blank_page(page):
         result["type"] = "Empty Page"
         result["amount"] = 0
         return result
-    result["type"] = "Shipping List"
-    result["amount"] = 1
-    return result
+    else:
+        result["type"] = "Shipping List"
+        result["amount"] = 1
+        return result
 
 
 def save_shipping_list_pages(file: PdfFileReader, page_number: list) -> str:
@@ -57,102 +49,31 @@ def is_it_blank_page(page: pdf.PageObject) -> bool:
 
 def separate_labels(file: object, page_number: int, label_type: str, amount: int, rotate_labels: bool,
                     output: PdfFileWriter) -> None:
-    if label_type == "Loginter":
-        # Create a page for every sticker.
-        # Copy the ith page to first_ticket.
-        first_ticket = PdfFileReader(file).getPage(page_number)
-        # Crop the first ticket of the page.
-        first_ticket.cropBox.lowerLeft = (28, 820)
-        first_ticket.cropBox.upperRight = (292, 420)
+    # Create a page for every sticker.
+    # Copy the ith page to first_ticket.
+    first_ticket = PdfFileReader(file).getPage(page_number)
+    # Crop the first ticket of the page.
+    first_ticket.cropBox.lowerLeft = (31, 567)  # First number is left margin, second one is the top.
+    first_ticket.cropBox.upperRight = (295, 19)  # First one is right margin, second ome is the bottom.
+    if rotate_labels:
+        first_ticket = first_ticket.rotateClockwise(90)
+    output.addPage(first_ticket)
+    # Repeat for every ticket of the page.
+    if amount > 1:
+        second_ticket = PdfFileReader(file).getPage(page_number)
+        second_ticket.cropBox.lowerLeft = (296, 567)
+        second_ticket.cropBox.upperRight = (560, 19)
         if rotate_labels:
-            first_ticket = first_ticket.rotateClockwise(90)
-        output.addPage(first_ticket)
-        # Repeat for every ticket of the page.
-        if amount > 1:
-            second_ticket = PdfFileReader(file).getPage(page_number)
-            second_ticket.cropBox.lowerLeft = (296, 820)
-            second_ticket.cropBox.upperRight = (560, 420)
-            if rotate_labels:
-                second_ticket = second_ticket.rotateClockwise(90)
-            output.addPage(second_ticket)
+            second_ticket = second_ticket.rotateClockwise(90)
+        output.addPage(second_ticket)
 
-        if amount > 2:
-            third_ticket = PdfFileReader(file).getPage(page_number)
-            third_ticket.cropBox.lowerLeft = (28, 400)
-            third_ticket.cropBox.upperRight = (292, 0)
-            if rotate_labels:
-                third_ticket = third_ticket.rotateClockwise(90)
-            output.addPage(third_ticket)
-
-        if amount > 3:
-            fourth_ticket = PdfFileReader(file).getPage(page_number)
-            fourth_ticket.cropBox.lowerLeft = (296, 400)
-            fourth_ticket.cropBox.upperRight = (560, 0)
-            if rotate_labels:
-                fourth_ticket = fourth_ticket.rotateClockwise(90)
-            output.addPage(fourth_ticket)
-
-    if label_type == "Flex":
-        first_ticket = PdfFileReader(file).getPage(page_number)
-        first_ticket.cropBox.lowerLeft = (30, 510)
-        first_ticket.cropBox.upperRight = (285, 815)
+    if amount > 2:
+        third_ticket = PdfFileReader(file).getPage(page_number)
+        third_ticket.cropBox.lowerLeft = (561, 567)
+        third_ticket.cropBox.upperRight = (825, 19)
         if rotate_labels:
-            first_ticket = first_ticket.rotateClockwise(90)
-        output.addPage(first_ticket)
-        if amount > 1:
-            second_ticket = PdfFileReader(file).getPage(page_number)
-            second_ticket.cropBox.lowerLeft = (295, 510)
-            second_ticket.cropBox.upperRight = (550, 815)
-            if rotate_labels:
-                second_ticket = second_ticket.rotateClockwise(90)
-            output.addPage(second_ticket)
-        if amount > 2:
-            third_ticket = PdfFileReader(file).getPage(page_number)
-            third_ticket.cropBox.lowerLeft = (30, 90)
-            third_ticket.cropBox.upperRight = (285, 395)
-            if rotate_labels:
-                third_ticket = third_ticket.rotateClockwise(90)
-            output.addPage(third_ticket)
-        if amount > 3:
-            fourth_ticket = PdfFileReader(file).getPage(page_number)
-            fourth_ticket.cropBox.lowerLeft = (295, 90)
-            fourth_ticket.cropBox.upperRight = (550, 395)
-            if rotate_labels:
-                fourth_ticket = fourth_ticket.rotateClockwise(90)
-            output.addPage(fourth_ticket)
-
-    if label_type == "Mail Shipping":
-        first_ticket = PdfFileReader(file).getPage(page_number)
-        first_ticket.cropBox.lowerLeft = (0, 787)
-        first_ticket.cropBox.upperRight = (283, 460)
-        if rotate_labels:
-            first_ticket = first_ticket.rotateClockwise(90)
-        output.addPage(first_ticket)
-
-        # Repeat for every ticket of the page.
-        if amount > 1:
-            second_ticket = PdfFileReader(file).getPage(page_number)
-            second_ticket.cropBox.lowerLeft = (310, 787)
-            second_ticket.cropBox.upperRight = (593, 460)
-            if rotate_labels:
-                second_ticket = second_ticket.rotateClockwise(90)
-            output.addPage(second_ticket)
-
-        if amount > 2:
-            third_ticket = PdfFileReader(file).getPage(page_number)
-            third_ticket.cropBox.lowerLeft = (0, 372)
-            third_ticket.cropBox.upperRight = (283, 45)
-            if rotate_labels:
-                third_ticket = third_ticket.rotateClockwise(90)
-            output.addPage(third_ticket)
-
-        if amount > 3:
-            fourth_ticket = PdfFileReader(file).getPage(page_number)
-            fourth_ticket.cropBox.lowerLeft = (310, 372)
-            fourth_ticket.cropBox.upperRight = (593, 45)
-            if rotate_labels:
-                fourth_ticket = fourth_ticket.rotateClockwise(90)
-            output.addPage(fourth_ticket)
+            third_ticket = third_ticket.rotateClockwise(90)
+        output.addPage(third_ticket)
 
 
 def get_shipment_id_from_label(table):
